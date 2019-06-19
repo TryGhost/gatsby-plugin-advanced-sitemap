@@ -25,7 +25,10 @@ By default this plugin will generate a single sitemap of all pages on your site,
 ```javascript
 // gatsby-config.js
 
-const plugins = [
+siteMetadata: {
+    siteUrl: `https://www.example.com`,
+},
+plugins: [
     `gatsby-plugin-advanced-sitemap`
 ]
 ```
