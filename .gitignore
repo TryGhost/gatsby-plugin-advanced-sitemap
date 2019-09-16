@@ -70,6 +70,5 @@ typings/
 .vscode
 
 /__tests__
-yarn.lock
 yarn-error.log
 node_modules
