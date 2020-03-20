@@ -34,7 +34,7 @@
     "@babel/cli": "7.8.4",
     "@babel/core": "7.8.7",
     "babel-eslint": "10.1.0",
-    "babel-preset-gatsby-package": "0.2.18",
+    "babel-preset-gatsby-package": "0.3.0",
     "cross-env": "7.0.2",
     "eslint": "6.8.0",
     "eslint-plugin-ghost": "1.0.0",
