@@ -236,7 +236,11 @@ const serialize = ({ ...sources } = {},{ site, allSitePage }, mapping) => {
 
     const pageNodes = addPageNodes(nodes, allSitePage.edges, siteUrl)
 
-    const allNodes = _.merge(nodes, pageNodes)
+    const allNodes = _.unionWith(
+        nodes,
+        pageNodes,
+        (obj, src) => obj.url === src.url
+    );
 
     return allNodes
 }
