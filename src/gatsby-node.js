@@ -240,7 +240,7 @@ const serialize = ({ ...sources } = {},{ site, allSitePage }, mapping) => {
         nodes,
         pageNodes,
         (obj, src) => obj.url === src.url
-    );
+    )
 
     return allNodes
 }
