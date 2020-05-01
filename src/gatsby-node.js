@@ -208,8 +208,8 @@ const serialize = ({ ...sources } = {}, { site, allSitePage }, { mapping, addUnc
                     if (!node) {
                         return
                     }
-
-                    if (type === `allMarkdownRemark` || type === `allMdx`) {
+                    const nodeType = node.__typename ? `all${node.__typename}` : type;
+                    if (nodeType === `allMarkdownRemark` || nodeType === `allMdx`) {
                         node = serializeMarkdownNodes(node)
                     }
 
