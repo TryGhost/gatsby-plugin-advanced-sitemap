@@ -164,7 +164,8 @@ const runQuery = (handler, { query, exclude }) => handler(query).then((r) => {
         // Removing excluded paths
         if (r.data[source] && r.data[source].edges && r.data[source].edges.length) {
             r.data[source].edges = r.data[source].edges.filter(({ node }) => !exclude.some((excludedRoute) => {
-                const slug = (source === `allMarkdownRemark` || source === `allMdx`) ? node.fields.slug.replace(/^\/|\/$/, ``) : node.slug.replace(/^\/|\/$/, ``)
+                const sourceType = node.__typename ? `all${node.__typename}` : source;
+                const slug = (sourceType === `allMarkdownRemark` || sourceType === `allMdx`) ? node.fields.slug.replace(/^\/|\/$/, ``) : node.slug.replace(/^\/|\/$/, ``)
                 excludedRoute = typeof excludedRoute === `object` ? excludedRoute : excludedRoute.replace(/^\/|\/$/, ``)
 
                 // test if the passed regular expression is valid
