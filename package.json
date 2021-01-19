@@ -35,7 +35,7 @@
     "@babel/core": "7.11.6",
     "babel-eslint": "10.1.0",
     "babel-preset-gatsby-package": "0.11.0",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "eslint": "7.18.0",
     "eslint-plugin-ghost": "2.0.0",
     "eslint-plugin-react": "7.22.0"
