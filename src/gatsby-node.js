@@ -39,7 +39,7 @@ const copyStylesheet = async ({siteUrl, pathPrefix, indexOutput}) => {
     const data = await utils.readFile(XSLFILE);
 
     // Replace the `{{blog-url}}` variable with our real site URL
-    const sitemapStylesheet = data.toString().replace(siteRegex, new URL(path.join(pathPrefix, indexOutput),siteUrl).toString());
+    const sitemapStylesheet = data.toString().replace(siteRegex, new URL(path.join(pathPrefix, indexOutput), siteUrl).toString());
 
     // Save the updated stylesheet to the public folder, so it will be
     // available for the xml sitemap files
@@ -94,7 +94,7 @@ const getNodePath = (node, allSitePage) => {
 
 // Add all other URLs that Gatsby generated, using siteAllPage,
 // but we didn't fetch with our queries
-const addPageNodes = (parsedNodesArray, allSiteNodes, siteUrl) => {
+const addPageNodes = (parsedNodesArray, allSiteNodes) => {
     const [parsedNodes] = parsedNodesArray;
     const pageNodes = [];
     const addedPageNodes = {pages: []};
@@ -115,7 +115,7 @@ const addPageNodes = (parsedNodesArray, allSiteNodes, siteUrl) => {
 
     remainingNodes.forEach(({node}) => {
         addedPageNodes.pages.push({
-            url: new URL(node.url,siteURL).toString(),
+            url: new URL(node.url, siteURL).toString(),
             node: node
         });
     });
