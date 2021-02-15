@@ -1,5 +1,4 @@
 import path from 'path';
-import url from 'url';
 import _ from 'lodash';
 
 import defaultOptions from './defaults';
@@ -40,7 +39,7 @@ const copyStylesheet = async ({siteUrl, pathPrefix, indexOutput}) => {
     const data = await utils.readFile(XSLFILE);
 
     // Replace the `{{blog-url}}` variable with our real site URL
-    const sitemapStylesheet = data.toString().replace(siteRegex, url.resolve(siteUrl, path.join(pathPrefix, indexOutput)));
+    const sitemapStylesheet = data.toString().replace(siteRegex, new URL(path.join(pathPrefix, indexOutput),siteUrl).toString());
 
     // Save the updated stylesheet to the public folder, so it will be
     // available for the xml sitemap files
@@ -116,7 +115,7 @@ const addPageNodes = (parsedNodesArray, allSiteNodes, siteUrl) => {
 
     remainingNodes.forEach(({node}) => {
         addedPageNodes.pages.push({
-            url: url.resolve(siteUrl, node.url),
+            url: new URL(node.url,siteURL).toString(),
             node: node
         });
     });
@@ -248,7 +247,7 @@ const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaught
                     node = getNodePath(node, allSitePage);
 
                     sourceObject[mapping[type].sitemap].push({
-                        url: url.resolve(siteURL, node.path),
+                        url: new URL(node.path, siteURL).toString(),
                         node: node
                     });
                 });
