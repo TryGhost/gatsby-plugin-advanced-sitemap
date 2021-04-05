@@ -40,7 +40,7 @@
     "cross-env": "7.0.3",
     "eslint": "7.23.0",
     "eslint-plugin-ghost": "2.0.0",
-    "eslint-plugin-jest": "24.3.2",
+    "eslint-plugin-jest": "24.3.4",
     "eslint-plugin-react": "7.23.1",
     "gatsby": "2.32.0",
     "jest": "26.6.3",
