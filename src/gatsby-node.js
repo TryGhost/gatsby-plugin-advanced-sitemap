@@ -40,11 +40,11 @@ const copyStylesheet = async ({siteUrl, pathPrefix, indexOutput, hideAttribution
     const data = await utils.readFile(XSLFILE);
 
     // Replace the `{{blog-url}}` variable with our real site URL
-    const sitemapStylesheet = data.toString().replace(siteRegex, url.resolve(siteUrl, path.join(pathPrefix, indexOutput)));
+    let sitemapStylesheet = data.toString().replace(siteRegex, url.resolve(siteUrl, path.join(pathPrefix, indexOutput)));
 
     // Hide Ghost attribution if set by user
     if (hideAttribution) {
-        sitemapStylesheet = sitemapStylesheet.replace(/<p.*?Ghost.*?\/p>/s, '')
+        sitemapStylesheet = sitemapStylesheet.replace(/<p.*?Ghost.*?\/p>/s, '');
     }
     // Save the updated stylesheet to the public folder, so it will be
     // available for the xml sitemap files
