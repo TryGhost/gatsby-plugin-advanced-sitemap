@@ -15,17 +15,18 @@ const defaultOptions = {
     }`,
     mapping: {
         allSitePage: {
-            sitemap: `pages`
-        }
+            sitemap: `pages`,
+        },
     },
     output: `/sitemap.xml`,
     exclude: [
         `/dev-404-page`,
         `/404`,
         `/404.html`,
-        `/offline-plugin-app-shell-fallback`
+        `/offline-plugin-app-shell-fallback`,
     ],
-    createLinkInHead: true
+    createLinkInHead: true,
+    ignorePathPrefix: true,
 };
 
 export default defaultOptions;
