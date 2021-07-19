@@ -1,6 +1,6 @@
 import SiteMapIndexGenerator from './IndexMapGenerator';
 import SiteMapGenerator from './SiteMapGenerator';
-import _ from 'lodash';
+import uniq from 'lodash/uniq';
 
 export default class SiteMapManager {
     constructor(options) {
@@ -16,7 +16,7 @@ export default class SiteMapManager {
         }
 
         // ensure, we have a cleaned up array
-        sitemapTypes = _.uniq(sitemapTypes);
+        sitemapTypes = uniq(sitemapTypes);
 
         // create sitemaps for each type
         sitemapTypes.forEach((type) => {

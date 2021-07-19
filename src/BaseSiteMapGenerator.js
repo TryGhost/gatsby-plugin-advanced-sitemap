@@ -1,6 +1,7 @@
-import _ from 'lodash';
+import map from 'lodash/map';
+import sortBy from 'lodash/sortBy';
 import xml from 'xml';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import path from 'path';
 
 import * as utils from './utils';
@@ -14,6 +15,7 @@ const XMLNS_DECLS = {
 };
 
 export default class BaseSiteMapGenerator {
+    ISO8601_FORMAT = `YYYY-MM-DDTHH:mm:ssZ`;
     constructor() {
         this.nodeLookup = {};
         this.nodeTimeLookup = {};
@@ -24,18 +26,22 @@ export default class BaseSiteMapGenerator {
     generateXmlFromNodes(options) {
         const self = this;
         // Get a mapping of node to timestamp
-        const timedNodes = _.map(this.nodeLookup, function (node, id) {
-            return {
-                id: id,
-                // Using negative here to sort newest to oldest
-                ts: -(self.nodeTimeLookup[id] || 0),
-                node: node
-            };
-        }, []);
+        const timedNodes = map(
+            this.nodeLookup,
+            function (node, id) {
+                return {
+                    id: id,
+                    // Using negative here to sort newest to oldest
+                    ts: -(self.nodeTimeLookup[id] || 0),
+                    node: node
+                };
+            },
+            []
+        );
         // Sort nodes by timestamp
-        const sortedNodes = _.sortBy(timedNodes, `ts`);
+        const sortedNodes = sortBy(timedNodes, `ts`);
         // Grab just the nodes
-        const urlElements = _.map(sortedNodes, `node`);
+        const urlElements = map(sortedNodes, `node`);
         const data = {
             // Concat the elements to the _attr declaration
             urlset: [XMLNS_DECLS].concat(urlElements)
@@ -61,16 +67,17 @@ export default class BaseSiteMapGenerator {
 
         // force regeneration of xml
         this.siteMapContent = null;
-        this.lastModified = moment(new Date());
+        this.lastModified = dayjs(new Date());
     }
 
     getLastModifiedForDatum(datum) {
         if (datum.updated_at || datum.published_at || datum.created_at) {
-            const modifiedDate = datum.updated_at || datum.published_at || datum.created_at;
+            const modifiedDate =
+                datum.updated_at || datum.published_at || datum.created_at;
 
-            return moment(new Date(modifiedDate));
+            return dayjs(new Date(modifiedDate));
         } else {
-            return moment(new Date());
+            return dayjs(new Date());
         }
     }
 
@@ -83,12 +90,17 @@ export default class BaseSiteMapGenerator {
     }
 
     createUrlNodeFromDatum(url, datum) {
-        let node, imgNode;
+        let node; let imgNode;
 
         node = {
             url: [
                 {loc: url},
-                {lastmod: moment(this.getLastModifiedForDatum(datum), moment.ISO_8601).toISOString()}
+                {
+                    lastmod: dayjs(
+                        this.getLastModifiedForDatum(datum),
+                        this.ISO8601_FORMAT
+                    ).toISOString()
+                }
             ]
         };
 
@@ -103,7 +115,8 @@ export default class BaseSiteMapGenerator {
 
     createImageNodeFromDatum(datum) {
         // Check for cover first because user has cover but the rest only have image
-        const image = datum.cover_image || datum.profile_image || datum.feature_image;
+        const image =
+            datum.cover_image || datum.profile_image || datum.feature_image;
         let imageEl;
 
         if (!image) {
@@ -117,7 +130,7 @@ export default class BaseSiteMapGenerator {
         ];
 
         // Return the node to be added to the url xml node
-        return { 'image:image': imageEl } //eslint-disable-line
+        return { "image:image": imageEl }; //eslint-disable-line
     }
 
     validateImageUrl(imageUrl) {

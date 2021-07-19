@@ -1,6 +1,9 @@
 import path from 'path';
 import url from 'url';
-import _ from 'lodash';
+import difference from 'lodash/difference';
+import map from 'lodash/map';
+import uniqBy from 'lodash/uniqBy';
+import merge from 'lodash/merge';
 
 import defaultOptions from './defaults';
 import Manager from './SiteMapManager';
@@ -108,7 +111,7 @@ const addPageNodes = (parsedNodesArray, allSiteNodes, siteUrl) => {
         return foundOne;
     });
 
-    const remainingNodes = _.difference(allSiteNodes, usedNodes);
+    const remainingNodes = difference(allSiteNodes, usedNodes);
 
     remainingNodes.forEach(({node}) => {
         addedPageNodes.pages.push({
@@ -129,7 +132,7 @@ const serializeSources = ({mapping, additionalSitemaps = []}) => {
         sitemaps.push(mapping[resourceType]);
     }
 
-    sitemaps = _.map(sitemaps, (source) => {
+    sitemaps = map(sitemaps, (source) => {
         // Ignore the key and only return the name and
         // source as we need those to create the index
         // and the belonging sources accordingly
@@ -151,7 +154,7 @@ const serializeSources = ({mapping, additionalSitemaps = []}) => {
         });
     }
 
-    sitemaps = _.uniqBy(sitemaps, `name`);
+    sitemaps = uniqBy(sitemaps, `name`);
 
     return sitemaps;
 };
@@ -265,7 +268,7 @@ const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaught
         }
     }
 
-    nodes[0].pages = _.uniqBy(nodes[0].pages, `url`);
+    nodes[0].pages = uniqBy(nodes[0].pages, `url`);
 
     return nodes;
 };
@@ -275,7 +278,7 @@ exports.onPostBuild = async ({graphql, pathPrefix}, pluginOptions) => {
 
     // Passing the config option addUncaughtPages will add all pages which are not covered by passed mappings
     // to the default `pages` sitemap. Otherwise they will be ignored.
-    const options = pluginOptions.addUncaughtPages ? _.merge(defaultOptions, pluginOptions) : Object.assign({}, defaultOptions, pluginOptions);
+    const options = pluginOptions.addUncaughtPages ? merge(defaultOptions, pluginOptions) : Object.assign({}, defaultOptions, pluginOptions);
 
     const indexSitemapFile = path.join(PUBLICPATH, pathPrefix, options.output);
     const resourcesSitemapFile = path.join(PUBLICPATH, pathPrefix, RESOURCESFILE);

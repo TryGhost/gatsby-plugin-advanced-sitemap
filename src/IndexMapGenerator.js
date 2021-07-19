@@ -1,6 +1,6 @@
-import _ from 'lodash';
+import map from 'lodash/map';
 import xml from 'xml';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import url from 'url';
 import path from 'path';
 
@@ -13,6 +13,7 @@ const XMLNS_DECLS = {
 };
 
 export default class SiteMapIndexGenerator {
+    ISO8601_FORMAT = `YYYY-MM-DDTHH:mm:ssZ`;
     constructor(options) {
         options = options || {};
         this.types = options.types;
@@ -30,16 +31,16 @@ export default class SiteMapIndexGenerator {
     }
 
     generateSiteMapUrlElements({sources, siteUrl, pathPrefix, resourcesOutput}) {
-        return _.map(sources, (source) => {
+        return map(sources, (source) => {
             const filePath = resourcesOutput.replace(/:resource/, source.name).replace(/^\//, ``);
             const siteMapUrl = source.url ? source.url : url.resolve(siteUrl, path.join(pathPrefix, filePath));
-            const lastModified = source.url ? moment(new Date(), moment.ISO_8601).toISOString()
-                : this.types[source.sitemap].lastModified || moment(new Date(), moment.ISO_8601).toISOString();
+            const lastModified = source.url ? dayjs(new Date(), this.ISO8601_FORMAT).toISOString()
+                : this.types[source.sitemap].lastModified || dayjs(new Date(), this.ISO8601_FORMAT).toISOString();
 
             return {
                 sitemap: [
                     {loc: siteMapUrl},
-                    {lastmod: moment(lastModified).toISOString()}
+                    {lastmod: dayjs(lastModified).toISOString()}
                 ]
             };
         });
