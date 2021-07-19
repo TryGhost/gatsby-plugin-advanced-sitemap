@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import xml from 'xml';
 import moment from 'moment';
-import url from 'url';
 import path from 'path';
 
 import * as utils from './utils';
@@ -32,7 +31,7 @@ export default class SiteMapIndexGenerator {
     generateSiteMapUrlElements({sources, siteUrl, pathPrefix, resourcesOutput}) {
         return _.map(sources, (source) => {
             const filePath = resourcesOutput.replace(/:resource/, source.name).replace(/^\//, ``);
-            const siteMapUrl = source.url ? source.url : url.resolve(siteUrl, path.join(pathPrefix, filePath));
+            const siteMapUrl = source.url ? source.url : new URL(path.join(pathPrefix, filePath), siteUrl).toString();
             const lastModified = source.url ? moment(new Date(), moment.ISO_8601).toISOString()
                 : this.types[source.sitemap].lastModified || moment(new Date(), moment.ISO_8601).toISOString();
 
