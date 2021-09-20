@@ -33,15 +33,19 @@ const DEFAULTMAPPING = {
 };
 let siteURL;
 
-const copyStylesheet = async ({siteUrl, pathPrefix, indexOutput}) => {
+const copyStylesheet = async ({siteUrl, pathPrefix, indexOutput, hideAttribution}) => {
     const siteRegex = /(\{\{blog-url\}\})/g;
 
     // Get our stylesheet template
     const data = await utils.readFile(XSLFILE);
 
     // Replace the `{{blog-url}}` variable with our real site URL
-    const sitemapStylesheet = data.toString().replace(siteRegex, url.resolve(siteUrl, path.join(pathPrefix, indexOutput)));
+    let sitemapStylesheet = data.toString().replace(siteRegex, url.resolve(siteUrl, path.join(pathPrefix, indexOutput)));
 
+    // Hide Ghost attribution if set by user
+    if (hideAttribution) {
+        sitemapStylesheet = sitemapStylesheet.replace(/<p.*?Ghost.*?\/p>/s, '');
+    }
     // Save the updated stylesheet to the public folder, so it will be
     // available for the xml sitemap files
     await utils.writeFile(path.join(PUBLICPATH, `sitemap.xsl`), sitemapStylesheet);
@@ -164,7 +168,7 @@ const runQuery = (handler, {query, mapping, exclude}) => handler(query).then((r)
     for (let source in r.data) {
         // Check for custom serializer
         if (typeof mapping?.[source]?.serializer === `function`) {
-            if (r.data[source] && Array.isArray(r.data[source].edges)) { 
+            if (r.data[source] && Array.isArray(r.data[source].edges)) {
                 const serializedEdges = mapping[source].serializer(r.data[source].edges);
 
                 if (!Array.isArray(serializedEdges)) {
@@ -176,10 +180,10 @@ const runQuery = (handler, {query, mapping, exclude}) => handler(query).then((r)
 
         // Removing excluded paths
         if (r.data?.[source]?.edges && r.data[source].edges.length) {
-            r.data[source].edges = r.data[source].edges.filter(({node}) => !exclude.some((excludedRoute) => { 
+            r.data[source].edges = r.data[source].edges.filter(({node}) => !exclude.some((excludedRoute) => {
                 const sourceType = node.__typename ? `all${node.__typename}` : source;
                 const slug = (sourceType === `allMarkdownRemark` || sourceType === `allMdx`) || (node?.fields?.slug) ? node.fields.slug.replace(/^\/|\/$/, ``) : node.slug.replace(/^\/|\/$/, ``);
-                
+
                 excludedRoute = typeof excludedRoute === `object` ? excludedRoute : excludedRoute.replace(/^\/|\/$/, ``);
 
                 // test if the passed regular expression is valid
