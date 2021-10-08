@@ -24,9 +24,9 @@
     "lint": "eslint --ext .js -c .eslintrc.js --cache src/**",
     "test": "jest .",
     "build": "babel src --out-dir . --ignore **/__tests__",
-    "prepare": "cross-env NODE_ENV=production yarn build",
+    "prepare": "cross-env NODE_ENV=production npm run build",
     "watch": "babel -w src --out-dir . --ignore **/__tests__",
-    "ship": "STATUS=$(git status --porcelain); echo $STATUS; if [ -z \"$STATUS\" ]; then yarn publish && git push --follow-tags; fi"
+    "ship": "STATUS=$(git status --porcelain); echo $STATUS; if [ -z \"$STATUS\" ]; then npm publish && git push --follow-tags; fi"
   },
   "peerDependencies": {
     "gatsby": "^3.0.0"
