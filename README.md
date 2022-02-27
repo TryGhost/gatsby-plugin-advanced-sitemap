@@ -170,4 +170,4 @@ yarn test
 
 # Copyright & License
 
-Copyright (c) 2013-2021 [Ghost Foundation](https://ghost.org/) - Released under the [MIT license](LICENSE).
+Copyright (c) 2013-2022 [Ghost Foundation](https://ghost.org/) - Released under the [MIT license](LICENSE).
