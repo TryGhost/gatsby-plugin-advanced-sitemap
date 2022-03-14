@@ -76,13 +76,28 @@ const getNodePath = (node, allSitePage) => {
     if (!node.path || node.path === `/`) {
         return node;
     }
-    const slugRegex = new RegExp(`${node.path.replace(/\/$/, ``)}$`, `gi`);
+
+    const exactMatchRegex = new RegExp(`^${node.path.replace(/\/$/, ``)}$`, `gi`);
+    const partialMatchRegex = new RegExp(`${node.path.replace(/\/$/, ``)}$`, `gi`);
+
+    let partialMatch;
 
     for (let page of allSitePage.edges) {
-        if (page?.node?.url && page.node.url.replace(/\/$/, ``).match(slugRegex)) {
-            node.path = page.node.url;
-            break;
+        if (!page?.node?.url) {
+            continue;
         }
+        const url = page.node.url.replace(/\/$/, ``);
+        if (exactMatchRegex.test(url)) {
+            node.path = page.node.url;
+            return node;
+        }
+        if (partialMatchRegex.test(url)) {
+            partialMatch = page.node.url;
+        }
+    }
+
+    if (partialMatch) {
+        node.path = partialMatch;
     }
 
     return node;
@@ -163,7 +178,7 @@ const runQuery = (handler, {query, mapping, exclude}) => handler(query).then((r)
     for (let source in r.data) {
         // Check for custom serializer
         if (typeof mapping?.[source]?.serializer === `function`) {
-            if (r.data[source] && Array.isArray(r.data[source].edges)) { 
+            if (r.data[source] && Array.isArray(r.data[source].edges)) {
                 const serializedEdges = mapping[source].serializer(r.data[source].edges);
 
                 if (!Array.isArray(serializedEdges)) {
@@ -175,10 +190,10 @@ const runQuery = (handler, {query, mapping, exclude}) => handler(query).then((r)
 
         // Removing excluded paths
         if (r.data?.[source]?.edges && r.data[source].edges.length) {
-            r.data[source].edges = r.data[source].edges.filter(({node}) => !exclude.some((excludedRoute) => { 
+            r.data[source].edges = r.data[source].edges.filter(({node}) => !exclude.some((excludedRoute) => {
                 const sourceType = node.__typename ? `all${node.__typename}` : source;
                 const slug = (sourceType === `allMarkdownRemark` || sourceType === `allMdx`) || (node?.fields?.slug) ? node.fields.slug.replace(/^\/|\/$/, ``) : node.slug.replace(/^\/|\/$/, ``);
-                
+
                 excludedRoute = typeof excludedRoute === `object` ? excludedRoute : excludedRoute.replace(/^\/|\/$/, ``);
 
                 // test if the passed regular expression is valid
