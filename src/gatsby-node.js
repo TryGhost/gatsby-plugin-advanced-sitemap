@@ -163,7 +163,7 @@ const runQuery = (handler, {query, mapping, exclude}) => handler(query).then((r)
     for (let source in r.data) {
         // Check for custom serializer
         if (typeof mapping?.[source]?.serializer === `function`) {
-            if (r.data[source] && Array.isArray(r.data[source].edges)) { 
+            if (r.data[source] && Array.isArray(r.data[source].edges)) {
                 const serializedEdges = mapping[source].serializer(r.data[source].edges);
 
                 if (!Array.isArray(serializedEdges)) {
@@ -175,10 +175,10 @@ const runQuery = (handler, {query, mapping, exclude}) => handler(query).then((r)
 
         // Removing excluded paths
         if (r.data?.[source]?.edges && r.data[source].edges.length) {
-            r.data[source].edges = r.data[source].edges.filter(({node}) => !exclude.some((excludedRoute) => { 
+            r.data[source].edges = r.data[source].edges.filter(({node}) => !exclude.some((excludedRoute) => {
                 const sourceType = node.__typename ? `all${node.__typename}` : source;
                 const slug = (sourceType === `allMarkdownRemark` || sourceType === `allMdx`) || (node?.fields?.slug) ? node.fields.slug.replace(/^\/|\/$/, ``) : node.slug.replace(/^\/|\/$/, ``);
-                
+
                 excludedRoute = typeof excludedRoute === `object` ? excludedRoute : excludedRoute.replace(/^\/|\/$/, ``);
 
                 // test if the passed regular expression is valid
@@ -205,7 +205,7 @@ const runQuery = (handler, {query, mapping, exclude}) => handler(query).then((r)
     return r.data;
 });
 
-const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaughtPages}) => {
+const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaughtPages, slugsMapping}) => {
     const nodes = [];
     const sourceObject = {};
 
@@ -230,9 +230,9 @@ const serialize = ({...sources} = {}, {site, allSitePage}, {mapping, addUncaught
                     // to reflect this. This prevents mapping issues, when we later update
                     // the path with the Gatsby generated one in `getNodePath`
                     if (mapping[type].path) {
-                        node.path = path.resolve(mapping[type].path, node.slug);
+                        node.path = path.resolve(mapping[type].path, node.slug) + `/`
                     } else {
-                        node.path = node.slug;
+                        node.path = node.slug in slugsMapping ? `/${slugsMapping[node.slug]}/` : `/${node.slug}/`;
                     }
 
                     if (typeof mapping[type].prefix === `string` && mapping[type].prefix !== ``){
@@ -277,6 +277,7 @@ exports.onPostBuild = async ({graphql, pathPrefix}, pluginOptions) => {
     const options = pluginOptions.addUncaughtPages ? _.merge(defaultOptions, pluginOptions) : Object.assign({}, defaultOptions, pluginOptions);
 
     const indexSitemapFile = path.join(PUBLICPATH, pathPrefix, options.output);
+    const summarySitemapFile = path.join(PUBLICPATH, pathPrefix, options.summaryOutput);
     const resourcesSitemapFile = path.join(PUBLICPATH, pathPrefix, RESOURCESFILE);
 
     delete options.plugins;
@@ -312,6 +313,10 @@ exports.onPostBuild = async ({graphql, pathPrefix}, pluginOptions) => {
         }
     });
 
+    for (const additionPage of options.additionPages) {
+        manager.addUrls(`pages`, { url: siteURL + additionPage.path , node: { slug: additionPage.slug, id: additionPage.id } });
+    }
+
     // The siteUrl is only available after we have the returned query results
     options.siteUrl = siteURL;
     options.pathPrefix = pathPrefix;
@@ -341,6 +346,15 @@ exports.onPostBuild = async ({graphql, pathPrefix}, pluginOptions) => {
     // Save the generated xml files in the public folder
     try {
         await utils.outputFile(indexSitemapFile, indexSiteMap);
+    } catch (err) {
+        console.error(err);
+    }
+
+    const summarySiteMap = manager.getSiteMapXml('summary', options);
+
+    // Save the generated xml files in the public folder
+    try {
+        await utils.outputFile(summarySitemapFile, summarySiteMap);
     } catch (err) {
         console.error(err);
     }

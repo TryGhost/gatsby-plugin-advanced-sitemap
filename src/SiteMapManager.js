@@ -26,6 +26,7 @@ export default class SiteMapManager {
         this.index = options.index || this.createIndexGenerator(sitemapTypes);
         // create the default pages one for all fallback sitemap URLs
         this.pages = options.pages || this.createSiteMapGenerator(options, `pages`);
+        this.summary = options.summary || this.createSiteMapGenerator(options, `summary`);
     }
 
     createIndexGenerator(sitemapTypes) {
@@ -53,7 +54,7 @@ export default class SiteMapManager {
     // This is the equivalent of adding the URLs on bootstrap by listening to the events
     // like we do in Ghost core
     addUrls(type, {url, node}) {
+        this['summary'].addUrl(url, node);
         return this[type].addUrl(url, node);
     }
 }
-

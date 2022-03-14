@@ -18,14 +18,17 @@ const defaultOptions = {
             sitemap: `pages`
         }
     },
-    output: `/sitemap.xml`,
+    output: `/sitemap-index.xml`,
+    summaryOutput: `/sitemap.xml`,
     exclude: [
         `/dev-404-page`,
         `/404`,
         `/404.html`,
         `/offline-plugin-app-shell-fallback`
     ],
-    createLinkInHead: true
+    createLinkInHead: true,
+    slugsMapping: {},
+    additionPages: []
 };
 
 export default defaultOptions;
