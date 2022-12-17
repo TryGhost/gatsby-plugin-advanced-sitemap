@@ -75,12 +75,12 @@ const runQuery = (handler, { query, mapping, exclude }) => handler(query).then((
     return r.data;
 });
 
-const serialize = ({ ...sources } = {}, { site, allSitePage }, { mapping, addUncaughtPages }) => {
+const serialize = ({ ...sources } = {}, { site, allSitePage }, { mapping, addUncaughtPages, pathPrefix }) => {
     const nodes = [];
     const sourceObject = {};
 
     const allSitePagePathNodeMap = new Map();
-    
+
     allSitePage.edges.forEach((page) => {
         if (page?.node?.url){
             const pathurl = page.node.url.replace(/\/$/,``);
@@ -122,7 +122,7 @@ const serialize = ({ ...sources } = {}, { site, allSitePage }, { mapping, addUnc
                     node = getNodePath(node, allSitePagePathNodeMap);
 
                     sourceObject[mapping[type].sitemap].push({
-                        url: new URL(node.path, siteURL).toString(),
+                        url: new URL(path.join(pathPrefix, node.path), siteURL).toString(),
                         node: node,
                     });
                 });
@@ -155,10 +155,10 @@ exports.onPostBuild = async ({ graphql, pathPrefix }, pluginOptions) => {
     // Passing the config option addUncaughtPages will add all pages which are not covered by passed mappings
     // to the default `pages` sitemap. Otherwise they will be ignored.
     const options = pluginOptions.addUncaughtPages ? merge(defaultOptions, pluginOptions) : Object.assign({}, defaultOptions, pluginOptions);
+    options.pathPrefix = pathPrefix;
 
-    const indexSitemapFile = path.join(PUBLICPATH, pathPrefix, options.output);
-    const resourcesSitemapFile = path.join(PUBLICPATH, pathPrefix, RESOURCESFILE);
-
+    const indexSitemapFile = path.join(PUBLICPATH, options.output);
+    const resourcesSitemapFile = path.join(PUBLICPATH, RESOURCESFILE);
     delete options.plugins;
     delete options.createLinkInHead;
 
@@ -194,8 +194,6 @@ exports.onPostBuild = async ({ graphql, pathPrefix }, pluginOptions) => {
 
     // The siteUrl is only available after we have the returned query results
     options.siteUrl = siteURL;
-    options.pathPrefix = pathPrefix;
-
     await copyStylesheet(options);
 
     const resourcesSiteMapsArray = [];
