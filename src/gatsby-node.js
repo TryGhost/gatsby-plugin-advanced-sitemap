@@ -11,13 +11,14 @@ import { getNodePath } from './helpers';
 
 let siteURL;
 
-const copyStylesheet = async ({ siteUrl, pathPrefix, indexOutput }) => {
+const copyStylesheet = async ({ siteUrl, basePath, indexOutput }) => {
     const siteRegex = /(\{\{blog-url\}\})/g;
 
     // Get our stylesheet template
     const data = await utils.readFile(XSLFILE);
 
     // Replace the `{{blog-url}}` variable with our real site URL
+    const pathPrefix = basePath || ``;
     const sitemapStylesheet = data.toString().replace(siteRegex, new URL(path.join(pathPrefix, indexOutput), siteUrl).toString());
 
     // Save the updated stylesheet to the public folder, so it will be
@@ -149,13 +150,14 @@ const serialize = ({ ...sources } = {}, { site, allSitePage }, { mapping, addUnc
     return nodes;
 };
 
-exports.onPostBuild = async ({ graphql, pathPrefix }, pluginOptions) => {
+exports.onPostBuild = async ({ graphql, basePath }, pluginOptions) => {
     let queryRecords;
 
     // Passing the config option addUncaughtPages will add all pages which are not covered by passed mappings
     // to the default `pages` sitemap. Otherwise they will be ignored.
     const options = pluginOptions.addUncaughtPages ? merge(defaultOptions, pluginOptions) : Object.assign({}, defaultOptions, pluginOptions);
 
+    const pathPrefix = basePath || ``;
     const indexSitemapFile = path.join(PUBLICPATH, pathPrefix, options.output);
     const resourcesSitemapFile = path.join(PUBLICPATH, pathPrefix, RESOURCESFILE);
 
