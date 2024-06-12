@@ -83,8 +83,8 @@ const serialize = ({ ...sources } = {}, { site, allSitePage }, { mapping, addUnc
     
     allSitePage.edges.forEach((page) => {
         if (page?.node?.url){
-            const pathurl = page.node.url.replace(/\/$/,``);
-            allSitePagePathNodeMap.set(pathurl, pathurl);
+            const pathurl = page.node.url;
+            allSitePagePathNodeMap.set(pathurl.replace(/\/$/,``), pathurl);
         }
     });
 
