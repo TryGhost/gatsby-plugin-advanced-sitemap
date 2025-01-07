@@ -47,4 +47,4 @@ The Ghost Foundation acknowledges that, except as explicitly described in this A
 
 # Copyright & License
 
-Copyright (c) 2013-2023 [Ghost Foundation](https://ghost.org) - Released under the [MIT license](LICENSE).
+Copyright (c) 2013-2025 [Ghost Foundation](https://ghost.org) - Released under the [MIT license](LICENSE).
