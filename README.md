@@ -1,3 +1,9 @@
+# Deprecated
+
+This project is no longer maintained.
+
+---
+
 # gatsby-plugin-advanced-sitemap
 
 The default Gatsby sitemap plugin generates a simple blob of raw XML for all your pages. This **advanced sitemap plugin** adds more power and configuration, generating a single or multiple sitemaps with full XSL templates to make them neatly organised and human + machine readable, as well linking image resources to encourage media indexing.
