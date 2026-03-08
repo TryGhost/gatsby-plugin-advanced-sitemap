@@ -6,6 +6,7 @@ const path = require(`path`);
 const { onPostBuild } = require(`../gatsby-node`);
 const utils = require(`../utils`);
 
+const basePath = undefined;
 const pathPrefix = ``;
 
 beforeEach(() => {
@@ -53,7 +54,7 @@ describe(`Test plugin sitemap`, () => {
             },
         });
 
-        await onPostBuild({ graphql, pathPrefix }, {});
+        await onPostBuild({ graphql, pathPrefix, basePath }, {});
 
         const [filePath] = utils.outputFile.mock.calls[0];
 
@@ -114,7 +115,7 @@ describe(`Test plugin sitemap`, () => {
               slug: path
             }
           }
-        } 
+        }
     }`;
 
         const options = {
@@ -128,7 +129,7 @@ describe(`Test plugin sitemap`, () => {
             query: customQuery,
         };
 
-        await onPostBuild({ graphql, pathPrefix }, options);
+        await onPostBuild({ graphql, pathPrefix, basePath }, options);
 
         const [filePath] = utils.outputFile.mock.calls[0];
 
@@ -196,9 +197,58 @@ describe(`sitemap index`, () => {
         utils.outputFile = jest.fn();
         utils.outputFile.mockResolvedValue(true);
 
-        await onPostBuild({ graphql, pathPrefix }, options);
+        await onPostBuild({ graphql, pathPrefix, basePath }, options);
         const [sitemap] = utils.outputFile.mock.calls[0];
 
         expect(sitemap).toEqual(path.join(`public`, `sitemap.xml`));
     });
+
+    it(`uses basePath instead of pathPrefix`, async () => {
+        const basePath = '/blog'
+        const pathPrefix = 'https://cdn.example.com/blog'
+
+        utils.writeFile = jest.fn();
+        utils.writeFile.mockResolvedValue(true);
+
+        utils.outputFile = jest.fn();
+        utils.outputFile.mockResolvedValue(true);
+
+        utils.readFile = jest.fn();
+        utils.readFile.mockResolvedValue(true);
+
+        const graphql = jest.fn();
+
+        graphql.mockResolvedValue({
+            data: {
+                site: {
+                    siteMetadata: {
+                        siteUrl: `http://dummy.url`,
+                    },
+                },
+                allSitePage: {
+                    edges: [
+                        {
+                            node: {
+                                id: 1,
+                                slug: `page-1`,
+                                url: `http://dummy.url/page-1`,
+                            },
+                        },
+                        {
+                            node: {
+                                id: 2,
+                                slug: `page-2`,
+                                url: `http://dummy.url/page-2`,
+                            },
+                        },
+                    ],
+                },
+            },
+        });
+
+        await onPostBuild({ graphql, pathPrefix, basePath }, {});
+        const [sitemap] = utils.outputFile.mock.calls[0];
+
+        expect(sitemap).toEqual(path.join(`public`, `blog`, `sitemap.xml`));
+    })
 });
